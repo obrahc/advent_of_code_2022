@@ -64,10 +64,6 @@ pub fn main() !void {
     try stdout.print("Part Two: {d}\n" , .{result[1]});
 }
 
-fn toSlice(a: [4]u8) []u8 {
-    return a[0..4];
-}
-
 test "Provided Test Input" {
     var file = try std.fs.cwd().openFile("test_input/test1.txt", .{});
     defer file.close();
