@@ -5,19 +5,19 @@ const ArrayList = std.ArrayList;
 const allocator = std.heap.page_allocator;
 const stdout = std.io.getStdOut().writer();
 
-fn partOne(games: []u16) u32 {
+fn partOne(games: [][]u8) u32 {
     var total: u32 = 0;
     for (games) |game| {
-        var points: u32 = switch(game) {
-            6588 => 3 + 1,
-            6589 => 6 + 2,
-            6590 => 0 + 3,
-            6688 => 0 + 1,
-            6689 => 3 + 2,
-            6690 => 6 + 3,
-            6788 => 6 + 1,
-            6789 => 0 + 2,
-            6790 => 3 + 3,
+        var points: u32 = switch(hash(game)) {
+            hash("A X") => 3 + 1,
+            hash("A Y") => 6 + 2,
+            hash("A Z") => 0 + 3,
+            hash("B X") => 0 + 1,
+            hash("B Y") => 3 + 2,
+            hash("B Z") => 6 + 3,
+            hash("C X") => 6 + 1,
+            hash("C Y") => 0 + 2,
+            hash("C Z") => 3 + 3,
             else => unreachable,
         };
         total += points;
@@ -25,19 +25,19 @@ fn partOne(games: []u16) u32 {
     return total;
 }
 
-fn partTwo(games: []u16) u32 {
+fn partTwo(games: [][]u8) u32 {
     var total: u32 = 0;
     for (games) |game| {
-        var points: u32 = switch(game) {
-            6588 => 0 + 3,
-            6589 => 3 + 1,
-            6590 => 6 + 2,
-            6688 => 0 + 1,
-            6689 => 3 + 2,
-            6690 => 6 + 3,
-            6788 => 0 + 2,
-            6789 => 3 + 3,
-            6790 => 6 + 1,
+        var points: u32 = switch(hash(game)) {
+            hash("A X") => 0 + 3,
+            hash("A Y") => 3 + 1,
+            hash("A Z") => 6 + 2,
+            hash("B X") => 0 + 1,
+            hash("B Y") => 3 + 2,
+            hash("B Z") => 6 + 3,
+            hash("C X") => 0 + 2,
+            hash("C Y") => 3 + 3,
+            hash("C Z") => 6 + 1,
             else => unreachable,
         };
         total += points;
@@ -45,17 +45,17 @@ fn partTwo(games: []u16) u32 {
     return total;
 }
 
-fn simpleHash(line: []u8) u16 {
-    return (@as(u16, line[0]) * 100) + @as(u16, line[2]);
+fn hash(s: []const u8) u16 {
+    return (@as(u16, s[0]) * 100) + @as(u16, s[2]);
 }
 
 fn common(lines: ArrayList([]u8)) ![2]u32 {
     var result: [2]u32 = std.mem.zeroes([2]u32);
-    var games = ArrayList(u16).init(allocator);
+    var games = ArrayList([]u8).init(allocator);
     defer games.deinit();
 
     for (lines.items) |line| {
-        try games.append(simpleHash(line));
+        try games.append(line);
     }
 
     const gamesSlice = games.toOwnedSlice();
