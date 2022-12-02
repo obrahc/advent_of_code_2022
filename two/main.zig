@@ -5,87 +5,57 @@ const ArrayList = std.ArrayList;
 const allocator = std.heap.page_allocator;
 const stdout = std.io.getStdOut().writer();
 
-const Choice = enum (u2) { rock, paper, scissor };
-
-fn calculateResultFromMoves(advmove: u8, move: u8) u32 {
-        var result: i8 = @intCast(i8, advmove) - @intCast(i8, move);
-        var p: u32 = switch(result) {
-            -22, -25 => 0,
-            -21, -24 => 6,
-            -23 => 3,
+fn partOne(games: []u16) u32 {
+    var total: u32 = 0;
+    for (games) |game| {
+        var points: u32 = switch(game) {
+            6588 => 3 + 1,
+            6589 => 6 + 2,
+            6590 => 0 + 3,
+            6688 => 0 + 1,
+            6689 => 3 + 2,
+            6690 => 6 + 3,
+            6788 => 6 + 1,
+            6789 => 0 + 2,
+            6790 => 3 + 3,
             else => unreachable,
         };
-
-        return p;
-}
-
-fn calculatePointsForMove(move: u8) u32 {
-    var movePoints: u32 = switch(move) {
-        65, 88 => 1,
-        66, 89 => 2,
-        67, 90 => 3,
-        else => unreachable,
-    };
-    return movePoints;
-}
-
-fn calculateMoveFromResult(result: u32, advmove: u8) u8 {
-    var move: u8 = switch(result) {
-        0 => calculateMove(advmove, false),
-        3 => advmove,
-        6 => calculateMove(advmove, true),
-        else => unreachable,
-    };
-    return move;
-}
-
-fn calculateMove(advmove: u8, winning: bool) u8 {
-    const move: u8 = switch(advmove) {
-        65 => if (winning) 89  else 90,
-        66 => if (winning) 90  else 88,
-        67 => if (winning) 88  else 89,
-        else => unreachable,
-    };
-    return move;
-}
-
-fn calculateResultFromLetter(l: u8) u32 {
-    const result: u32 = switch(l) {
-        88 => 0,
-        89 => 3,
-        90 => 6,
-        else => unreachable,
-    };
-    return result;
-}
-
-fn partOne(games: [][2]u8) u32 {
-    var total: u32 = 0;
-    for (games) |game| {
-        total += calculateResultFromMoves(game[0], game[1]);
-        total += calculatePointsForMove(game[1]);
+        total += points;
     }
     return total;
 }
 
-fn partTwo(games: [][2]u8) u32 {
+fn partTwo(games: []u16) u32 {
     var total: u32 = 0;
     for (games) |game| {
-        var result: u32 = calculateResultFromLetter(game[1]);
-
-        total += result;
-        total += calculatePointsForMove(calculateMoveFromResult(result, game[0]));
+        var points: u32 = switch(game) {
+            6588 => 0 + 3,
+            6589 => 3 + 1,
+            6590 => 6 + 2,
+            6688 => 0 + 1,
+            6689 => 3 + 2,
+            6690 => 6 + 3,
+            6788 => 0 + 2,
+            6789 => 3 + 3,
+            6790 => 6 + 1,
+            else => unreachable,
+        };
+        total += points;
     }
     return total;
+}
+
+fn simpleHash(line: []u8) u16 {
+    return (@as(u16, line[0]) * 100) + @as(u16, line[2]);
 }
 
 fn common(lines: ArrayList([]u8)) ![2]u32 {
     var result: [2]u32 = std.mem.zeroes([2]u32);
-    var games = ArrayList([2]u8).init(allocator);
+    var games = ArrayList(u16).init(allocator);
     defer games.deinit();
 
     for (lines.items) |line| {
-        try games.append([2]u8{line[0], line[2]});
+        try games.append(simpleHash(line));
     }
 
     const gamesSlice = games.toOwnedSlice();
