@@ -1,4 +1,5 @@
 const std = @import("std");
+const aocutils = @import("utils.zig");
 const fmt = std.fmt;
 const ArrayList = std.ArrayList;
 
@@ -18,11 +19,14 @@ fn partTwo(elfs: []u32) !u32 {
     return elfs[0] + elfs[1] + elfs[2];
 }
 
-fn common(lines: ArrayList([]u8)) ![2]u32 {
+fn common() !void {
     var result: [2]u32 = std.mem.zeroes([2]u32);
     var calories: u32 = 0;
     var elfs = ArrayList(u32).init(allocator);
     defer elfs.deinit();
+
+    var lines = try aocutils.ReadAOCInput(allocator, "inputs/day1.txt");
+    defer lines.deinit();
 
     for (lines.items) |line| {
         if (isEmptyLine(line)){
@@ -42,26 +46,13 @@ fn common(lines: ArrayList([]u8)) ![2]u32 {
     
     result[0] = partOne(sorted_elfs);
     result[1] = try partTwo(sorted_elfs);
-    return result;
+    try stdout.print("Day One\n" , .{});
+    try stdout.print("Part One: {d}\n" , .{result[0]});
+    try stdout.print("Part Two: {d}\n\n" , .{result[1]});
 }
 
 pub fn main() !void {
-    var file = try std.fs.cwd().openFile("input.txt", .{});
-    defer file.close();
-
-    var buf_reader = std.io.bufferedReader(file.reader());
-    var in_stream = buf_reader.reader();
-    
-    var lines = ArrayList([]u8).init(allocator);
-    defer lines.deinit();
-
-    while (try in_stream.readUntilDelimiterOrEofAlloc(allocator, '\n', 20)) |line|{
-        try lines.append(line);
-    }
-
-    var result: [2]u32 = try common(lines);
-    try stdout.print("Part One: {d}\n" , .{result[0]});
-    try stdout.print("Part Two: {d}\n" , .{result[1]});
+    try common();
 }
 
 test "Provided Test Input" {

@@ -1,4 +1,5 @@
 const std = @import("std");
+const aocutils = @import("utils.zig");
 const fmt = std.fmt;
 const ArrayList = std.ArrayList;
 
@@ -49,56 +50,35 @@ fn hash(s: []const u8) u16 {
     return (@as(u16, s[0]) * 100) + @as(u16, s[2]);
 }
 
-fn common(lines: ArrayList([]u8)) ![2]u32 {
+fn day2() !void {
     var result: [2]u32 = std.mem.zeroes([2]u32);
-    var games = ArrayList([]u8).init(allocator);
-    defer games.deinit();
+    
+    var lines = try aocutils.ReadAOCInput(allocator, "inputs/day2.txt");
+    defer lines.deinit();
 
-    for (lines.items) |line| {
-        try games.append(line);
-    }
-
-    const gamesSlice = games.toOwnedSlice();
+    const gamesSlice = lines.toOwnedSlice();
     
     result[0] = partOne(gamesSlice);
     result[1] = partTwo(gamesSlice);
-    return result;
+    try stdout.print("Day Two\n" , .{});
+    try stdout.print("Part One: {d}\n" , .{result[0]});
+    try stdout.print("Part Two: {d}\n\n" , .{result[1]});
 }
 
 pub fn main() !void {
-    var file = try std.fs.cwd().openFile("input.txt", .{});
-    defer file.close();
-
-    var buf_reader = std.io.bufferedReader(file.reader());
-    var in_stream = buf_reader.reader();
-    
-    var lines = ArrayList([]u8).init(allocator);
-    defer lines.deinit();
-
-    while (try in_stream.readUntilDelimiterOrEofAlloc(allocator, '\n', 20)) |line|{
-        try lines.append(line);
-    }
-
-    var result: [2]u32 = try common(lines);
-    try stdout.print("Part One: {d}\n" , .{result[0]});
-    try stdout.print("Part Two: {d}\n" , .{result[1]});
+    try day2();
 }
 
 test "Provided Test Input" {
-    var file = try std.fs.cwd().openFile("test_input/test1.txt", .{});
-    defer file.close();
-
-    var buf_reader = std.io.bufferedReader(file.reader());
-    var in_stream = buf_reader.reader();
+    var result: [2]u32 = std.mem.zeroes([2]u32);
     
-    var lines = ArrayList([]u8).init(allocator);
+    var lines = try aocutils.ReadAOCInput(allocator, "inputs/day2_test.txt");
     defer lines.deinit();
 
-    while (try in_stream.readUntilDelimiterOrEofAlloc(allocator, '\n', 20)) |line|{
-        try lines.append(line);
-    }
-
-    var result = try common(lines);
+    const gamesSlice = lines.toOwnedSlice();
+    
+    result[0] = partOne(gamesSlice);
+    result[1] = partTwo(gamesSlice);
     try std.testing.expect(result[0] == 15);
     try std.testing.expect(result[1] == 12);
 }
