@@ -11,7 +11,7 @@ pub fn ReadAOCInput(allocator: std.mem.Allocator, path: []const u8) ![]const[]co
     var lines = ArrayList([]u8).init(allocator);
     defer lines.deinit();
 
-    while (try in_stream.readUntilDelimiterOrEofAlloc(allocator, '\n', 64)) |line|{
+    while (try in_stream.readUntilDelimiterOrEofAlloc(allocator, '\n', 4096)) |line|{
         try lines.append(line);
     }
 
